@@ -1,0 +1,505 @@
+<!DOCTYPE html><html lang="es"><head>
+	
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width"/>
+<meta name="builder" content="Stronglify"/>
+<link rel="icon" type="image/x-icon" href="https://media.stronglify.com/295/favicon-caldera-1795215931.svg"/>
+<title>Caldera · Juego de disparos retro en el navegador</title>
+<meta name="description" content="Baja a una estación dentro de un volcán, esquiva drones hostiles y encuentra la salida. Se juega en el navegador."/>
+<meta name="robots" content="index"/>
+<link rel="canonical" href="https://stronglifythemes.github.io/"/><style>
+html{line-height:1.15;-webkit-text-size-adjust:100%}body{margin:0}main{display:block}h1{font-size:2em;margin:.67em 0}hr{box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace,monospace;font-size:1em}a{background-color:transparent}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}b,strong{font-weight:bolder}code,kbd,samp{font-family:monospace,monospace;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}img{border-style:none}button,input,optgroup,select,textarea{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,input{overflow:visible}button,select{text-transform:none}button,[type=button],[type=reset],[type=submit]{-webkit-appearance:button}button::-moz-focus-inner,[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner{border-style:none;padding:0}button:-moz-focusring,[type=button]:-moz-focusring,[type=reset]:-moz-focusring,[type=submit]:-moz-focusring{outline:1px dotted ButtonText}
+fieldset{padding:.35em .75em .625em}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal}progress{vertical-align:baseline}textarea{overflow:auto}[type=checkbox],[type=radio]{box-sizing:border-box;padding:0}[type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}[type=search]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}details{display:block}summary{display:list-item}template{display:none}[hidden]{display:none}img{max-width:100%;height:auto}
+</style><style>
+:root { --negro:#0b0b0c; --acero:#2a2d33; --gris:#9ca3af; --magma:#ff6a1a; --brasa:#ffb347; --texto:#ece9e4; --mono:"IBM Plex Mono",ui-monospace,monospace; --sans:"Chakra Petch",system-ui,sans-serif; --pad:clamp(1rem,4vw,3rem); }
+*,*::before,*::after { box-sizing:border-box; }
+body.caldera { margin:0; background:var(--negro); color:var(--texto); font-family:var(--sans); }
+.caldera a { color:inherit; }
+.cd-header { position:sticky; top:0; z-index:20; display:flex; justify-content:space-between; align-items:center; gap:1rem; width:100%; padding:.9rem var(--pad); background:#0b0b0ce6; backdrop-filter:blur(6px); border-bottom:2px solid var(--magma); }
+.cd-marca { font-weight:700; font-size:1.4rem; letter-spacing:.18em; text-transform:uppercase; text-decoration:none; color:var(--magma); }
+.cd-header nav, .cd-footer nav { display:flex; flex-wrap:wrap; gap:clamp(.8rem,2.5vw,1.8rem); }
+.cd-header nav a, .cd-footer nav a { text-decoration:none; font-family:var(--mono); font-size:.9rem; text-transform:uppercase; letter-spacing:.06em; }
+.cd-header nav a:hover, .cd-footer nav a:hover { color:var(--magma); }
+.cd-juego { position:relative; width:100%; background:#000; border-bottom:2px solid var(--acero); }
+.cd-juego canvas { display:block; width:100%; height:auto; max-height:calc(100svh - 6rem); aspect-ratio:16/10; object-fit:contain; image-rendering:pixelated; image-rendering:crisp-edges; cursor:crosshair; outline:none; background:#000; }
+.cd-juego canvas:focus-visible { box-shadow:inset 0 0 0 3px var(--magma); }
+.cd-juego-barra { display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; padding:.7rem var(--pad); font-family:var(--mono); font-size:.85rem; color:var(--gris); background:#111214; }
+.cd-juego-barra button, .cd-tactil button { font:inherit; color:var(--texto); background:var(--acero); border:1px solid #444; padding:.45rem .9rem; cursor:pointer; }
+.cd-juego-barra button:hover { border-color:var(--magma); color:var(--magma); }
+.cd-tactil { display:none; }
+@media (hover:none) and (pointer:coarse) {
+  .cd-tactil { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1rem var(--pad); background:#111214; }
+  .cd-stick { width:8.5rem; height:8.5rem; border-radius:50%; border:2px solid var(--magma); background:radial-gradient(circle,#ff6a1a33 0 30%,transparent 31%); touch-action:none; }
+  .cd-tactil-botones { display:flex; flex-direction:column; gap:.7rem; }
+  .cd-tactil button { min-width:7rem; min-height:3.2rem; font-family:var(--mono); text-transform:uppercase; touch-action:none; }
+  .cd-tactil button[data-cl-disparar] { background:var(--magma); color:#000; border-color:var(--magma); }
+}
+.cd-main section { padding:clamp(3rem,8vw,6.5rem) var(--pad); }
+.cd-main h2 { margin:0 0 clamp(1.5rem,4vw,2.5rem); font-size:clamp(2.2rem,6vw,4.8rem); line-height:.95; text-transform:uppercase; letter-spacing:-.01em; }
+.cd-historia { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:clamp(1.5rem,5vw,4rem); align-items:start; background:linear-gradient(180deg,#160a05,#0b0b0c 70%); }
+.cd-historia h1 { margin:0; grid-column:1/-1; font-size:clamp(4rem,14vw,12rem); line-height:.82; letter-spacing:.04em; color:var(--magma); text-shadow:0 0 30px #ff6a1a66; }
+.cd-lead { margin:0; font-size:clamp(1.3rem,2.4vw,2rem); line-height:1.25; }
+.cd-historia-texto { font-size:1.1rem; line-height:1.65; color:#cfcac2; }
+.cd-historia-texto p { margin:0 0 1rem; }
+.cd-controles ul { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr)); gap:1rem; }
+.cd-controles li { display:grid; gap:.6rem; padding:1.2rem; background:#141518; border:1px solid var(--acero); }
+.cd-controles kbd { justify-self:start; padding:.35rem .7rem; font-family:var(--mono); font-size:1rem; color:#000; background:var(--brasa); border-bottom:3px solid #b5541a; }
+.cd-bestiario-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr)); gap:1rem; }
+.cd-bestiario article { display:grid; gap:.6rem; justify-items:center; text-align:center; padding:1.6rem 1.2rem; background:#141518; border:1px solid var(--acero); }
+.cd-bestiario canvas { width:7rem; height:7rem; image-rendering:pixelated; image-rendering:crisp-edges; }
+.cd-bestiario h3 { margin:0; font-size:1.5rem; text-transform:uppercase; color:var(--brasa); }
+.cd-bestiario p { margin:0; line-height:1.5; color:#cfcac2; }
+.cd-faq { max-width:60rem; }
+.cd-faq details { padding:1.1rem 1.3rem; margin-bottom:.8rem; background:#141518; border-left:3px solid var(--magma); }
+.cd-faq summary { cursor:pointer; font-size:1.25rem; font-weight:700; }
+.cd-faq p { margin:.7rem 0 0; line-height:1.6; color:#cfcac2; }
+.cd-cta { display:grid; justify-items:center; gap:1.2rem; text-align:center; background:var(--magma); color:#000; }
+.cd-cta h2 { margin:0 !important; color:#000; }
+.cd-boton { display:inline-block; padding:1rem 1.6rem; background:#000; color:var(--magma) !important; text-decoration:none; font-family:var(--mono); font-weight:700; text-transform:uppercase; letter-spacing:.08em; }
+.cd-footer { padding:clamp(3rem,7vw,5rem) var(--pad) 2rem; background:#060607; border-top:2px solid var(--magma); }
+.cd-footer p { margin:0 0 2.5rem; max-width:24ch; font-size:clamp(1.8rem,4.5vw,3.6rem); line-height:1; text-transform:uppercase; }
+.cd-footer > div { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; padding-top:1.4rem; border-top:1px solid #222; }
+.cd-cabecera h1 { margin:0; font-size:clamp(3rem,10vw,8rem); line-height:.88; text-transform:uppercase; color:var(--magma); }
+.cd-cabecera p { margin:1rem 0 0; max-width:40ch; font-size:clamp(1.1rem,2vw,1.4rem); }
+.cd-blog { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr)); gap:1rem; padding:0 var(--pad) clamp(3rem,8vw,6rem); }
+.cd-entrada { display:grid; gap:.6rem; align-content:start; padding:1.6rem; background:#141518; border:1px solid var(--acero); text-decoration:none; transition:border-color .2s; }
+.cd-entrada:hover { border-color:var(--magma); }
+.cd-entrada span { font-family:var(--mono); font-size:.85rem; color:var(--brasa); }
+.cd-entrada h2 { margin:0 !important; font-size:clamp(1.5rem,2.6vw,2rem) !important; }
+.cd-entrada p { margin:0; line-height:1.55; color:#cfcac2; }
+.cd-prosa { width:min(calc(100% - 2rem),46rem); margin:0 auto clamp(3rem,8vw,6rem); font-size:clamp(1.05rem,1.6vw,1.2rem); line-height:1.7; color:#d8d3cb; }
+.cd-prosa h2 { margin:2rem 0 .5rem !important; font-size:clamp(1.6rem,3vw,2.3rem) !important; color:var(--magma); }
+.cd-blank { min-height:40vh; padding-top:2rem; }
+@media (max-width:52rem) { .cd-historia { grid-template-columns:minmax(0,1fr); } }
+ 
+.cd-solo-juego { margin:0; }
+.cd-solo-juego .cd-juego { position:relative; width:100%; height:calc(100svh - 3.9rem); background:#000; border:0; overflow:hidden; }
+.cd-solo-juego .cd-juego canvas { width:100%; height:100%; max-height:none; aspect-ratio:auto; object-fit:contain; }
+.cd-sonido { position:absolute; top:.8rem; right:.8rem; z-index:3; font:500 .8rem var(--mono); color:var(--texto); background:#000a; border:1px solid #444; padding:.4rem .8rem; cursor:pointer; }
+.cd-sonido:hover { border-color:var(--magma); color:var(--magma); }
+@media (hover:none) and (pointer:coarse) {
+  .cd-solo-juego .cd-tactil { position:absolute; left:0; right:0; bottom:0; z-index:3; background:transparent; padding:1rem; }
+}
+</style><link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin=""/>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap" rel="stylesheet"/></head>
+<body class="caldera">
+  <header class="cd-header">
+  <a class="cd-marca" href="./">Caldera</a>
+  <nav aria-label="Navegación principal">
+    
+    <a href="./">Jugar</a>
+    
+    <a href="./blog">Diario</a>
+    
+    <a href="./acerca-de">Acerca de</a>
+    
+    <a href="./contacto">Contacto</a>
+    
+  </nav>
+</header>
+
+<main class="cd-solo-juego">
+  <section class="cd-juego" id="jugar" aria-label="Juego Caldera">
+    <canvas id="cl-juego" aria-label="Caldera, juego de disparos en primera persona dentro de un volcán"></canvas>
+    <button class="cd-sonido" type="button" data-cl-sonido="">Sonido: sí</button>
+    <div class="cd-tactil" aria-hidden="true">
+      <div class="cd-stick" data-cl-mover=""></div>
+      <div class="cd-tactil-botones"><button type="button" data-cl-usar="">Usar</button><button type="button" data-cl-disparar="">Disparar</button></div>
+    </div>
+  </section>
+</main>
+<script>
+(() => {
+  const lienzo = document.getElementById('cl-juego');
+  if (!lienzo) return;
+  const W = 320, H = 200, TEX = 64;
+  lienzo.width = W; lienzo.height = H;
+  const ctx = lienzo.getContext('2d');
+  const img = ctx.createImageData(W, H);
+  const buf = new Uint32Array(img.data.buffer);
+  const zbuf = new Float32Array(W);
+  const rgb = (r, g, b) => (255 << 24) | (b << 16) | (g << 8) | r;
+  const sombra = (c, f) => { f = Math.max(0, Math.min(1, f)); return (255 << 24) | (((c >> 16 & 255) * f) << 16) | (((c >> 8 & 255) * f) << 8) | ((c & 255) * f); };
+  let semilla = 7; const azar = () => (semilla = (semilla * 16807) % 2147483647) / 2147483647;
+
+  
+  const hacerTex = fn => { const t = new Uint32Array(TEX * TEX); for (let y = 0; y < TEX; y++) for (let x = 0; x < TEX; x++) t[y * TEX + x] = fn(x, y); return t; };
+  const texRoca = hacerTex((x, y) => { const n = azar() * 30, g = 58 + n + ((x * 7 + y * 13) % 11) - (((y % 21) < 2 || ((x + (y / 21 | 0) * 9) % 32) < 2) ? 30 : 0); return rgb(g * .9 | 0, g * .78 | 0, g * .7 | 0); });
+  const texMetal = hacerTex((x, y) => { const borde = x < 2 || y < 2 || x > 61 || y > 61, rem = ((x % 16) - 8) ** 2 + ((y % 16) - 8) ** 2 < 3; const g = borde ? 40 : rem ? 150 : 92 + ((x + y) % 9) + azar() * 8; return rgb(g * .78 | 0, g * .84 | 0, g | 0); });
+  const texTubo = hacerTex((x, y) => { const t = Math.cos(((x % 16) / 16) * Math.PI * 2); const g = 70 + t * 40 + azar() * 6; return (y % 32) < 3 ? rgb(40, 40, 44) : rgb(g * .95 | 0, g * .9 | 0, g * .8 | 0); });
+  const texMagma = hacerTex((x, y) => { const v = Math.sin(x * .3 + Math.sin(y * .2) * 2) + Math.sin(y * .25 + x * .05); const roca = v < -.2; return roca ? rgb(38 + azar() * 10 | 0, 22, 18) : rgb(255, 90 + v * 60 + azar() * 30 | 0, 10 + azar() * 20 | 0); });
+  const texPuerta = hacerTex((x, y) => { const franja = ((x + y) >> 3) % 2 === 0 && (y < 6 || y > 57); const g = 88 + ((y % 8) < 1 ? -30 : 0) + azar() * 6; return franja ? rgb(255, 150, 20) : rgb(g * .7 | 0, g * .72 | 0, g * .76 | 0); });
+  const texSalida = hacerTex((x, y) => { const b = x < 4 || x > 59 || y < 4 || y > 59; const luz = ((x - 32) ** 2 + (y - 26) ** 2) < 60; return b ? rgb(255, 106, 26) : luz ? rgb(120, 255, 140) : rgb(46, 52, 58); });
+  const TEXTURAS = [null, texRoca, texMetal, texTubo, texMagma, texPuerta, texSalida];
+
+  
+  const SP = 32;
+  const hacerSprite = fn => { const t = new Uint32Array(SP * SP); for (let y = 0; y < SP; y++) for (let x = 0; x < SP; x++) t[y * SP + x] = fn(x - 15.5, y - 15.5) || 0; return t; };
+  const sprChispa = hacerSprite((x, y) => { const r = Math.hypot(x, y * 1.2); if (r < 7) return Math.hypot(x + 2, y + 2) < 2.5 ? rgb(255, 255, 210) : rgb(255, 140, 30); if (r < 9.5) return rgb(90, 92, 100); if (Math.abs(y) < 1.2 && Math.abs(x) < 15) return rgb(150, 150, 160); if ((Math.abs(x) > 12 && Math.abs(x) < 15) && Math.abs(y) < 4) return rgb(255, 210, 90); return 0; });
+  const sprMartillo = hacerSprite((x, y) => { if (Math.abs(x) < 11 && Math.abs(y) < 10) { if (Math.abs(y + 3) < 2.5 && Math.abs(x) < 7) return rgb(255, 60, 20); return ((x + 16) % 6 < 1 || (y + 16) % 6 < 1) ? rgb(60, 62, 70) : rgb(118, 122, 132); } if (y >= 10 && y < 15 && (Math.abs(x + 7) < 2 || Math.abs(x - 7) < 2)) return rgb(70, 70, 76); if (y < -10 && y > -14 && Math.abs(x) < 3) return rgb(255, 106, 26); return 0; });
+  const sprVida = hacerSprite((x, y) => { if (Math.abs(x) < 9 && Math.abs(y) < 7) return (Math.abs(x) < 2 && Math.abs(y) < 5) || (Math.abs(y) < 2 && Math.abs(x) < 5) ? rgb(255, 255, 255) : rgb(40, 200, 120); return 0; });
+  const sprRemaches = hacerSprite((x, y) => { if (y > -2 && y < 8 && Math.abs(x) < 10) return (x + 10) % 5 < 2 ? rgb(210, 214, 220) : rgb(120, 90, 50); return 0; });
+  const sprLlave = hacerSprite((x, y) => { if (Math.hypot(x + 5, y) < 5 && Math.hypot(x + 5, y) > 2.5) return rgb(255, 200, 40); if (Math.abs(y) < 1.5 && x > -1 && x < 10) return rgb(255, 200, 40); if (x > 5 && x < 8 && y > 0 && y < 5) return rgb(255, 200, 40); return 0; });
+  const sprCeniciento = hacerSprite((x, y) => {
+    const grieta = (Math.abs(x * .7 + y * .4) % 5) < .8 && Math.abs(x) < 7 && y > -6 && y < 6;
+    if (Math.hypot(x, y + 11) < 4.2) return (Math.abs(x + 1.6) < 1 || Math.abs(x - 1.6) < 1) && Math.abs(y + 11.5) < .9 ? rgb(255, 210, 60) : rgb(70, 64, 60);
+    if (Math.abs(x) < 7.5 && y > -7 && y < 4) return grieta ? rgb(255, 110, 20) : rgb(84 + (x * 3 % 9), 76, 70);
+    if (Math.abs(Math.abs(x) - 9.5) < 2.3 && y > -6 && y < 6) return y > 3 ? rgb(255, 120, 30) : rgb(66, 60, 56);
+    if (Math.abs(Math.abs(x) - 3.5) < 2.4 && y >= 4 && y < 15) return rgb(58, 54, 50);
+    return 0; });
+  const sprVigia = hacerSprite((x, y) => {
+    const capucha = Math.hypot(x, (y + 10) * 1.1) < 5.5 && y < -6;
+    if (capucha) return (Math.abs(x) < 3 && y > -10 && y < -7) ? ((Math.abs(x + 1.5) < .9 || Math.abs(x - 1.5) < .9) && Math.abs(y + 8.5) < .8 ? rgb(255, 80, 30) : rgb(10, 8, 10)) : rgb(40, 30, 44);
+    const ancho = 3 + (y + 6) * .35;
+    if (y >= -6 && y < 15 && Math.abs(x) < ancho) return ((x + y) % 4 === 0) ? rgb(54, 40, 60) : rgb(40, 30, 46);
+    if (y > -4 && y < 3 && x > 4 && x < 11) return x > 8 && Math.hypot(x - 10, y + 2) < 2.2 ? rgb(255, 150, 40) : rgb(120, 96, 110);
+    return 0; });
+  const sprReptante = hacerSprite((x, y) => { if (y < 4) return 0; const cuerpo = Math.hypot(x * .55, (y - 10) * 1.3) < 6; if (cuerpo) return (Math.abs(x + 4) < 1.2 || Math.abs(x + 1) < 1.2) && Math.abs(y - 8) < 1 ? rgb(255, 230, 60) : ((x | 0) % 3 === 0 ? rgb(70, 30, 26) : rgb(110, 44, 30)); if (y > 12 && y < 16 && (Math.abs(x) % 4) < 1.2 && Math.abs(x) < 10) return rgb(60, 26, 22); return 0; });
+  const sprSombra = hacerSprite((x, y) => { if (Math.hypot(x, y + 10) < 4.5) return (Math.abs(x + 1.8) < .9 || Math.abs(x - 1.8) < .9) && Math.abs(y + 10) < .9 ? rgb(170, 255, 230) : rgb(14, 14, 20); const w = 4.5 - Math.abs(y) * .12; if (y > -6 && y < 15 && Math.abs(x + Math.sin(y * .6) * 1.5) < w) return rgb(20, 20, 30); if (y > -5 && y < 6 && Math.abs(Math.abs(x) - 7 - y * .2) < 1.3) return rgb(24, 24, 34); return 0; });
+  const sprColoso = hacerSprite((x, y) => {
+    if (Math.abs(x) < 4 && y > -15 && y < -8) return (Math.abs(x) < 3 && Math.abs(y + 11.5) < 1) ? rgb(255, 230, 80) : rgb(60, 40, 36);
+    if (Math.abs(x) < 11 && y >= -8 && y < 5) { const g = (Math.abs(x * .5 - y * .3) % 4) < .7; return g ? rgb(255, 120 + (Math.abs(x * 9) % 60), 20) : rgb(48, 34, 30); }
+    if (Math.abs(Math.abs(x) - 13) < 2.6 && y > -7 && y < 9) return y > 6 ? rgb(255, 150, 40) : rgb(56, 40, 34);
+    if (Math.abs(Math.abs(x) - 5) < 3.2 && y >= 5 && y < 16) return rgb(44, 32, 28);
+    return 0; });
+  const diag = (fn) => hacerSprite((x, y) => fn((x + y) * .7071, (x - y) * .7071));
+  const sprEspada = diag((t, n) => { if (t > -12 && t < 9 && Math.abs(n) < 1.6) return Math.abs(n) < .5 ? rgb(200, 200, 230) : rgb(40, 36, 52); if (Math.abs(t - 9.5) < 1 && Math.abs(n) < 4.5) return rgb(255, 200, 60); if (t > 10 && t < 14 && Math.abs(n) < 1) return rgb(90, 60, 40); return 0; });
+  const sprHoja = diag((t, n) => { if (t > -13 && t < 9 && Math.abs(n) < 2.2 - (t < -9 ? (-9 - t) * .5 : 0)) return Math.abs(n) < .7 ? rgb(255, 240, 160) : rgb(255, 100, 20); if (Math.abs(t - 9.5) < 1 && Math.abs(n) < 5) return rgb(60, 60, 66); if (t > 10 && t < 14 && Math.abs(n) < 1.1) return rgb(40, 40, 44); return 0; });
+  const sprEscopeta = hacerSprite((x, y) => { if (Math.abs(y) < 2 && x > -13 && x < 8) return Math.abs(y + 1) < .6 ? rgb(170, 175, 185) : rgb(80, 84, 92); if (x > 4 && x < 13 && y > -1 && y < 5) return rgb(120, 80, 50); if (Math.abs(x + 2) < 2 && y > 1 && y < 4) return rgb(255, 140, 40); return 0; });
+  const sprLanzallamas = hacerSprite((x, y) => { if (Math.hypot(x - 2, y) < 5) return rgb(200, 60, 30); if (Math.abs(y) < 1.6 && x > -14 && x < 2) return rgb(90, 92, 100); if (x < -12 && Math.abs(y) < 3) return rgb(255, 170, 40); return 0; });
+  const sprArpon = diag((t, n) => { if (t > -14 && t < 10 && Math.abs(n) < .9) return rgb(150, 240, 255); if (t < -10 && Math.abs(n) < 3 - (-10 - t) * .7) return rgb(220, 255, 255); if (t > 8 && t < 13 && Math.abs(n) < 2) return rgb(70, 74, 82); return 0; });
+  const sprRemacheBala = hacerSprite((x, y) => Math.hypot(x, y) < 2.5 ? rgb(255, 255, 255) : Math.hypot(x, y) < 4.5 ? rgb(190, 210, 230) : Math.hypot(x, y) < 6 ? rgb(255, 160, 60) : 0);
+  const sprPerdigon = hacerSprite((x, y) => Math.hypot(x, y) < 2.5 ? rgb(255, 240, 200) : Math.hypot(x, y) < 4 ? rgb(255, 150, 40) : 0);
+  const sprLlama = hacerSprite((x, y) => { const r = Math.hypot(x, y * 1.3); return r < 4 ? rgb(255, 250, 200) : r < 8 ? rgb(255, 150, 30) : r < 11 ? rgb(220, 60, 10) : 0; });
+  const sprCristal = diag((t, n) => (Math.abs(n) < 1.4 && t > -12 && t < 12) ? (Math.abs(n) < .6 ? rgb(255, 255, 255) : rgb(120, 230, 255)) : 0);
+  const sprFuego = hacerSprite((x, y) => Math.hypot(x, y) < 3.5 ? rgb(255, 250, 200) : Math.hypot(x, y) < 6 ? rgb(255, 120, 20) : Math.hypot(x, y) < 7.5 ? rgb(180, 40, 10) : 0);
+  const sprBala = hacerSprite((x, y) => Math.hypot(x, y) < 4 ? rgb(255, 230, 120) : Math.hypot(x, y) < 6 ? rgb(255, 106, 26) : 0);
+
+  
+  
+  
+  const PLANO = [
+    '########################',
+    '#P...#.....g...M.....r.#',
+    '#.h..#.MMMM....M..m....#',
+    '#....D.M.sM..c.M.......#',
+    '##D###.M.rM....MMMDMMMM#',
+    '#..x..c....T.o...#.....#',
+    '#.TTT...x..T..h..#..br.#',
+    '#.T.e.....VTV....D.....#',
+    '#.T..m....VTV.z..#..r..#',
+    '#.TTTT....VVV....###D###',
+    '#..b..r.......x..#..g..#',
+    '###D######..MMMMM#..m..#',
+    '#....z...#..M...M#..f..#',
+    '#..g..h..D..M.k.M#.....#',
+    '#........#..M...M###D###',
+    '#.m.r..r.#..MMDMM#.....#',
+    '######D###.......D..c..#',
+    '#...x...VV..c....#..l..#',
+    '#.r.b...VV....o..#..h..#',
+    '#.......VV..TTTx.#.....#',
+    '#..h........T.m..#MMDMM#',
+    '#...a...gz..T....#M...M#',
+    '#...........T.r..D..X..#',
+    '########################'
+  ];
+  let inicio, mapa, MW, MH, jugador, enemigos, items, balas, mensajes, estado, tieneLlave, tiempo;
+  const codigos = { '#': 1, M: 2, T: 3, V: 4, D: 5, X: 6 };
+  const iniciar = () => {
+    MH = PLANO.length; MW = PLANO[0].length; mapa = []; enemigos = []; items = []; balas = []; mensajes = []; tieneLlave = false; tiempo = 0;
+    for (let y = 0; y < MH; y++) { mapa.push([]); for (let x = 0; x < MW; x++) {
+      const c = PLANO[y][x]; mapa[y].push(codigos[c] || 0);
+      const cx = x + .5, cy = y + .5;
+      if (c === 'P') { inicio = { x: cx, y: cy }; jugador = { x: cx, y: cy, a: 0, vida: 100, vidas: 3, remaches: 24, arma: 2, armas: { 1: true, 2: true }, enfriar: 0, golpe: 0, retroceso: 0, escudo: 0 }; }
+      if (c === 'c') enemigos.push({ tipo: 'chispa', x: cx, y: cy, vida: 40, vel: 2.1, enfriar: 0, daño: 0 });
+      if (c === 'm') enemigos.push({ tipo: 'martillo', x: cx, y: cy, vida: 90, vel: 1.1, enfriar: 1, daño: 0 });
+      if (c === 'g') enemigos.push({ tipo: 'ceniciento', x: cx, y: cy, vida: 75, vel: 1.4, enfriar: 0, daño: 0 });
+      if (c === 'b') enemigos.push({ tipo: 'vigia', x: cx, y: cy, vida: 55, vel: 1.25, enfriar: 1.2, daño: 0 });
+      if (c === 'x') enemigos.push({ tipo: 'reptante', x: cx, y: cy, vida: 30, vel: 3, enfriar: 0, daño: 0 });
+      if (c === 'z') enemigos.push({ tipo: 'sombra', x: cx, y: cy, vida: 50, vel: 2.3, enfriar: 0, daño: 0 });
+      if (c === 'o') enemigos.push({ tipo: 'coloso', x: cx, y: cy, vida: 220, vel: .85, enfriar: 0, daño: 0 });
+      if ('sfela'.includes(c)) items.push({ tipo: { s: 'espada', f: 'hoja', e: 'escopeta', l: 'lanzallamas', a: 'arpon' }[c], x: cx, y: cy });
+      if (c === 'h') items.push({ tipo: 'vida', x: cx, y: cy });
+      if (c === 'r') items.push({ tipo: 'remaches', x: cx, y: cy });
+      if (c === 'k') items.push({ tipo: 'llave', x: cx, y: cy });
+    } }
+    avisar('Busca la llave de la salida. Cuidado con los drones.');
+  };
+  const ARMAS = {
+    1: { nombre: 'Llave neumática', corto: 'LLAVE', mele: true, rango: 1.3, daño: 30, enfriar: .38, arco: .6 },
+    2: { nombre: 'Lanzador de remaches', corto: 'LANZADOR', vel: 14, daño: 34, enfriar: .3, costo: 1, n: 1, abre: 0, vida: 1.6, spr: 'remache' },
+    3: { nombre: 'Espada de obsidiana', corto: 'OBSIDIANA', mele: true, espada: true, rango: 1.7, daño: 48, enfriar: .42, arco: 1 },
+    4: { nombre: 'Hoja de magma', corto: 'HOJA MAGMA', mele: true, espada: true, rango: 1.9, daño: 80, enfriar: .75, arco: 1.15 },
+    5: { nombre: 'Escopeta de vapor', corto: 'ESCOPETA', vel: 12, daño: 14, enfriar: .8, costo: 3, n: 6, abre: .2, vida: .55, spr: 'perdigon' },
+    6: { nombre: 'Lanzallamas geotérmico', corto: 'LLAMAS', vel: 6.5, daño: 7, enfriar: .07, costo: .25, n: 1, abre: .14, vida: .5, spr: 'llama' },
+    7: { nombre: 'Arpón de cristal', corto: 'ARPÓN', vel: 19, daño: 95, enfriar: 1, costo: 3, n: 1, abre: 0, vida: 1.4, spr: 'cristal', atraviesa: true }
+  };
+  const elegir = n => { if (!jugador.armas[n]) { avisar('Todavía no tienes: ' + ARMAS[n].nombre); return; } jugador.arma = n; avisar(ARMAS[n].nombre + ' (' + n + ')'); sonar(700, 900, .06, 'triangle', .03); };
+  const ciclar = dir => { for (let i = 1; i <= 7; i++) { const n = ((jugador.arma - 1 + dir * i + 14) % 7) + 1; if (jugador.armas[n]) { elegir(n); return; } } };
+  const avisar = t => { mensajes.push({ t, hasta: performance.now() + 3200 }); if (mensajes.length > 3) mensajes.shift(); };
+  const solido = (x, y) => { const mx = x | 0, my = y | 0; return my < 0 || mx < 0 || my >= MH || mx >= MW || mapa[my][mx] > 0; };
+  const mover = (e, dx, dy, r = .22) => {
+    if (!solido(e.x + dx + Math.sign(dx) * r, e.y) && !solido(e.x + dx + Math.sign(dx) * r, e.y + r * .9) && !solido(e.x + dx + Math.sign(dx) * r, e.y - r * .9)) e.x += dx;
+    if (!solido(e.x, e.y + dy + Math.sign(dy) * r) && !solido(e.x + r * .9, e.y + dy + Math.sign(dy) * r) && !solido(e.x - r * .9, e.y + dy + Math.sign(dy) * r)) e.y += dy;
+  };
+  const visible = (ax, ay, bx, by) => { const d = Math.hypot(bx - ax, by - ay), n = Math.ceil(d * 6); for (let i = 1; i < n; i++) { const t = i / n; if (solido(ax + (bx - ax) * t, ay + (by - ay) * t)) return false; } return true; };
+
+  
+  let audio = null, mudo = false;
+  const sonar = (f1, f2, dur, tipo = 'square', vol = .06) => {
+    if (mudo || !audio) return;
+    const o = audio.createOscillator(), g = audio.createGain(), t = audio.currentTime;
+    o.type = tipo; o.frequency.setValueAtTime(f1, t); o.frequency.exponentialRampToValueAtTime(Math.max(30, f2), t + dur);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + dur);
+    o.connect(g).connect(audio.destination); o.start(t); o.stop(t + dur);
+  };
+
+  
+  const fijarPuntero = () => { try { const r = lienzo.requestPointerLock && lienzo.requestPointerLock(); if (r && r.catch) r.catch(() => {}); } catch (err) {   } };
+  const teclas = {};
+  let giroMouse = 0, disparando = false, tactil = { x: 0, y: 0, activo: false };
+  addEventListener('keydown', e => {
+    if (estado !== 'jugando' && (e.code === 'Enter' || e.code === 'Space') && document.activeElement === lienzo) { e.preventDefault(); empezar(); return; }
+    if (estado !== 'jugando') return;
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'Space'].includes(e.code)) e.preventDefault();
+    teclas[e.code] = true;
+    const num = /^Digit([1-7])$/.exec(e.code); if (num) elegir(+num[1]);
+    if (e.code === 'KeyQ') ciclar(1);
+    if (e.code === 'KeyE') usar();
+    if (e.code === 'Space') disparando = true;
+  });
+  addEventListener('keyup', e => { teclas[e.code] = false; if (e.code === 'Space') disparando = false; });
+  lienzo.tabIndex = 0;
+  lienzo.addEventListener('mousedown', () => { if (estado !== 'jugando') { empezar(); return; } if (document.pointerLockElement !== lienzo) fijarPuntero(); disparando = true; });
+  addEventListener('mouseup', () => { disparando = false; });
+  lienzo.addEventListener('wheel', e => { if (estado !== 'jugando') return; e.preventDefault(); ciclar(e.deltaY > 0 ? 1 : -1); }, { passive: false });
+  addEventListener('mousemove', e => { if (document.pointerLockElement === lienzo) giroMouse += e.movementX * .0028; });
+  const boton = document.querySelector('[data-cl-sonido]');
+  if (boton) boton.addEventListener('click', () => { mudo = !mudo; boton.textContent = mudo ? 'Sonido: no' : 'Sonido: sí'; });
+  
+  const zonaMover = document.querySelector('[data-cl-mover]'), btnDisparo = document.querySelector('[data-cl-disparar]'), btnUsar = document.querySelector('[data-cl-usar]');
+  if (zonaMover) {
+    const pos = e => { const r = zonaMover.getBoundingClientRect(), t = e.touches[0]; tactil.x = Math.max(-1, Math.min(1, (t.clientX - r.left - r.width / 2) / (r.width / 2))); tactil.y = Math.max(-1, Math.min(1, (t.clientY - r.top - r.height / 2) / (r.height / 2))); tactil.activo = true; };
+    zonaMover.addEventListener('touchstart', e => { e.preventDefault(); if (estado !== 'jugando') empezar(); pos(e); }, { passive: false });
+    zonaMover.addEventListener('touchmove', e => { e.preventDefault(); pos(e); }, { passive: false });
+    zonaMover.addEventListener('touchend', () => { tactil.activo = false; tactil.x = tactil.y = 0; });
+  }
+  if (btnDisparo) { btnDisparo.addEventListener('touchstart', e => { e.preventDefault(); if (estado !== 'jugando') empezar(); disparando = true; }, { passive: false }); btnDisparo.addEventListener('touchend', () => { disparando = false; }); }
+  const btnCambiar = document.querySelector('[data-cl-cambiar]');
+  if (btnCambiar) btnCambiar.addEventListener('touchstart', e => { e.preventDefault(); if (estado === 'jugando') ciclar(1); }, { passive: false });
+  if (btnUsar) btnUsar.addEventListener('touchstart', e => { e.preventDefault(); if (estado === 'jugando') usar(); }, { passive: false });
+
+  const empezar = () => {
+    if (!audio) { try { audio = new (window.AudioContext || window.webkitAudioContext)(); } catch (err) { audio = null; } }
+    iniciar(); estado = 'jugando'; lienzo.focus({ preventScroll: true });
+    if (!('ontouchstart' in window)) fijarPuntero();
+  };
+  const usar = () => {
+    const tx = (jugador.x + Math.cos(jugador.a) * .9) | 0, ty = (jugador.y + Math.sin(jugador.a) * .9) | 0;
+    if (ty < 0 || tx < 0 || ty >= MH || tx >= MW) return;
+    if (mapa[ty][tx] === 5) { mapa[ty][tx] = 0; sonar(180, 90, .35, 'sawtooth', .05); avisar('Compuerta abierta'); }
+    else if (mapa[ty][tx] === 6) { if (tieneLlave) { estado = 'victoria'; sonar(440, 880, .6, 'triangle', .07); document.exitPointerLock && document.exitPointerLock(); } else { avisar('La salida necesita la llave'); sonar(120, 80, .2); } }
+  };
+
+  
+  const disparar = () => {
+    if (jugador.enfriar > 0) return;
+    const A = ARMAS[jugador.arma];
+    if (!A.mele && jugador.remaches < A.costo) { avisar('Sin remaches: cambia a un arma cuerpo a cuerpo'); jugador.arma = jugador.armas[3] ? 3 : 1; return; }
+    jugador.retroceso = 1; jugador.enfriar = A.enfriar;
+    if (A.mele) {
+      if (A.espada) sonar(jugador.arma === 4 ? 160 : 520, jugador.arma === 4 ? 60 : 180, .18, 'sawtooth', .05); else sonar(220, 110, .12, 'square', .05);
+      enemigos.forEach(en => { if (en.vida <= 0) return; const d = Math.hypot(en.x - jugador.x, en.y - jugador.y), ang = Math.abs(normal(Math.atan2(en.y - jugador.y, en.x - jugador.x) - jugador.a)); if (d < A.rango && ang < A.arco) herir(en, A.daño); });
+      return;
+    }
+    jugador.remaches -= A.costo;
+    if (jugador.arma === 6) { if (Math.random() < .3) sonar(120 + Math.random() * 80, 60, .1, 'sawtooth', .025); } else sonar(jugador.arma === 7 ? 1400 : 900, 200, .12, 'square', .06);
+    for (let k = 0; k < A.n; k++) {
+      const ang = jugador.a + (A.n > 1 ? (k / (A.n - 1) - .5) * A.abre * 2 : (Math.random() - .5) * A.abre);
+      balas.push({ mia: true, x: jugador.x + Math.cos(ang) * .3, y: jugador.y + Math.sin(ang) * .3, vx: Math.cos(ang) * A.vel, vy: Math.sin(ang) * A.vel, daño: A.daño, vida: A.vida, spr: A.spr, atraviesa: A.atraviesa });
+    }
+  };
+  const herir = (en, n) => { en.vida -= n; en.daño = .15; if (en.vida <= 0) { sonar(300, 40, .4, 'sawtooth', .07); if (Math.random() < .45) items.push({ tipo: Math.random() < .5 ? 'remaches' : 'vida', x: en.x, y: en.y }); } else sonar(500, 300, .06, 'triangle', .04); };
+  const normal = a => { while (a > Math.PI) a -= Math.PI * 2; while (a < -Math.PI) a += Math.PI * 2; return a; };
+  const dañarJugador = n => {
+    if (jugador.escudo > 0) return;
+    jugador.vida -= n; jugador.golpe = .25; sonar(140, 60, .2, 'sawtooth', .06);
+    if (jugador.vida > 0) return;
+    jugador.vidas--;
+    if (jugador.vidas > 0) {
+      jugador.vida = 100; jugador.x = inicio.x; jugador.y = inicio.y; jugador.a = 0; jugador.escudo = 2.5; balas = [];
+      avisar(jugador.vidas === 1 ? 'Te queda 1 vida' : 'Te quedan ' + jugador.vidas + ' vidas'); sonar(330, 110, .6, 'triangle', .07);
+    } else { jugador.vida = 0; estado = 'muerte'; document.exitPointerLock && document.exitPointerLock(); }
+  };
+
+  
+  const actualizar = dt => {
+    tiempo += dt;
+    const giro = (teclas.ArrowLeft ? -1 : 0) + (teclas.ArrowRight ? 1 : 0) + tactil.x * .9;
+    jugador.a += giro * 2.6 * dt + giroMouse; giroMouse = 0;
+    const av = (teclas.KeyW || teclas.ArrowUp ? 1 : 0) - (teclas.KeyS || teclas.ArrowDown ? 1 : 0) - (tactil.activo ? tactil.y : 0);
+    const lat = (teclas.KeyD ? 1 : 0) - (teclas.KeyA ? 1 : 0);
+    const vel = 3.2 * dt, ca = Math.cos(jugador.a), sa = Math.sin(jugador.a);
+    mover(jugador, (ca * av - sa * lat) * vel, (sa * av + ca * lat) * vel);
+    jugador.escudo = Math.max(0, jugador.escudo - dt); jugador.enfriar = Math.max(0, jugador.enfriar - dt); jugador.golpe = Math.max(0, jugador.golpe - dt); jugador.retroceso = Math.max(0, jugador.retroceso - dt * 5);
+    if (disparando) disparar();
+    
+    items = items.filter(it => { if (Math.hypot(it.x - jugador.x, it.y - jugador.y) > .6) return true;
+      if (it.tipo === 'vida') { if (jugador.vida >= 100) return true; jugador.vida = Math.min(100, jugador.vida + 30); avisar('+30 de vida'); }
+      if (it.tipo === 'remaches') { jugador.remaches += 12; avisar('+12 remaches'); }
+      if (it.tipo === 'llave') { tieneLlave = true; avisar('Tienes la llave de la salida'); }
+      const nuevaArma = { espada: 3, hoja: 4, escopeta: 5, lanzallamas: 6, arpon: 7 }[it.tipo];
+      if (nuevaArma) { jugador.armas[nuevaArma] = true; jugador.arma = nuevaArma; avisar('Nueva arma: ' + ARMAS[nuevaArma].nombre + ' (' + nuevaArma + ')'); if (nuevaArma > 4) jugador.remaches += 8; }
+      sonar(600, 1200, .12, 'triangle', .05); return false; });
+    
+    enemigos.forEach(en => {
+      if (en.vida <= 0) return;
+      en.daño = Math.max(0, en.daño - dt); en.enfriar -= dt;
+      const dx = jugador.x - en.x, dy = jugador.y - en.y, d = Math.hypot(dx, dy);
+      if (d > 11 || !visible(en.x, en.y, jugador.x, jugador.y)) { en.flota = (en.flota || 0) + dt; return; }
+      const ux = dx / d, uy = dy / d;
+      if (en.tipo === 'chispa') {
+        if (d > .7) mover(en, ux * en.vel * dt, uy * en.vel * dt, .2);
+        else if (en.enfriar <= 0) { dañarJugador(8); en.enfriar = .8; }
+      } else if (en.tipo === 'reptante') {
+        if (d > .55) mover(en, ux * en.vel * dt, uy * en.vel * dt, .18);
+        else if (en.enfriar <= 0) { dañarJugador(6); en.enfriar = .55; }
+      } else if (en.tipo === 'sombra') {
+        if (d > .8) mover(en, ux * en.vel * dt, uy * en.vel * dt, .22);
+        else if (en.enfriar <= 0) { dañarJugador(12); en.enfriar = .9; sonar(1200, 300, .2, 'sine', .04); }
+      } else if (en.tipo === 'coloso') {
+        if (d > 1.1) mover(en, ux * en.vel * dt, uy * en.vel * dt, .38);
+        else if (en.enfriar <= 0) { dañarJugador(30); en.enfriar = 1.6; sonar(70, 30, .5, 'sawtooth', .09); }
+      } else if (en.tipo === 'ceniciento') {
+        if (d > .9) mover(en, ux * en.vel * dt, uy * en.vel * dt, .3);
+        else if (en.enfriar <= 0) { dañarJugador(18); en.enfriar = 1.3; sonar(90, 40, .3, 'sawtooth', .07); }
+      } else if (en.tipo === 'vigia') {
+        if (d > 5.5) mover(en, ux * en.vel * dt, uy * en.vel * dt, .25);
+        else if (d < 3) mover(en, -ux * en.vel * dt, -uy * en.vel * dt, .25);
+        if (en.enfriar <= 0) { balas.push({ x: en.x, y: en.y, vx: ux * 3.4, vy: uy * 3.4, fuego: true }); en.enfriar = 2 + Math.random() * .8; sonar(200, 500, .25, 'triangle', .04); }
+      } else {
+        if (d > 4.5) mover(en, ux * en.vel * dt, uy * en.vel * dt, .3);
+        else if (d < 2.5) mover(en, -ux * en.vel * dt, -uy * en.vel * dt, .3);
+        if (en.enfriar <= 0) { balas.push({ x: en.x, y: en.y, vx: ux * 4.5, vy: uy * 4.5 }); en.enfriar = 1.6 + Math.random() * .6; sonar(260, 180, .15, 'sawtooth', .04); }
+      }
+    });
+    enemigos = enemigos.filter(en => en.vida > 0 || (en.muerto = (en.muerto || 0) + dt) < .35);
+    balas = balas.filter(b => {
+      b.x += b.vx * dt; b.y += b.vy * dt;
+      if (b.vida !== undefined && (b.vida -= dt) <= 0) return false;
+      if (solido(b.x, b.y)) return false;
+      if (b.mia) {
+        for (const en of enemigos) { if (en.vida <= 0 || (b.tocados && b.tocados.has(en))) continue; if (Math.hypot(en.x - b.x, en.y - b.y) < (en.tipo === 'coloso' ? .6 : .42)) { herir(en, b.daño); if (!b.atraviesa) return false; (b.tocados ||= new Set()).add(en); } }
+        return true;
+      }
+      if (Math.hypot(b.x - jugador.x, b.y - jugador.y) < .35) { dañarJugador(b.fuego ? 16 : 12); return false; }
+      return true;
+    });
+  };
+
+  
+  const PISO = new Uint32Array(H), TECHO = new Uint32Array(H);
+  for (let y = 0; y < H; y++) { const k = Math.abs(y - H / 2) / (H / 2); PISO[y] = rgb(26 + k * 40 | 0, 20 + k * 22 | 0, 18 + k * 14 | 0); TECHO[y] = rgb(12 + k * 18 | 0, 12 + k * 14 | 0, 16 + k * 16 | 0); }
+  const dibujar = () => {
+    const dirX = Math.cos(jugador.a), dirY = Math.sin(jugador.a), planoX = -dirY * .66, planoY = dirX * .66;
+    for (let y = 0; y < H / 2; y++) { const c = TECHO[y], o = y * W; for (let x = 0; x < W; x++) buf[o + x] = c; }
+    for (let y = H / 2; y < H; y++) { const c = PISO[y], o = y * W; for (let x = 0; x < W; x++) buf[o + x] = c; }
+    for (let x = 0; x < W; x++) {
+      const cam = 2 * x / W - 1, rx = dirX + planoX * cam, ry = dirY + planoY * cam;
+      let mx = jugador.x | 0, my = jugador.y | 0;
+      const ddx = Math.abs(1 / rx), ddy = Math.abs(1 / ry);
+      let sx, sy, lx, ly, lado = 0, t = 0;
+      if (rx < 0) { sx = -1; lx = (jugador.x - mx) * ddx; } else { sx = 1; lx = (mx + 1 - jugador.x) * ddx; }
+      if (ry < 0) { sy = -1; ly = (jugador.y - my) * ddy; } else { sy = 1; ly = (my + 1 - jugador.y) * ddy; }
+      for (let i = 0; i < 64; i++) { if (lx < ly) { lx += ddx; mx += sx; lado = 0; } else { ly += ddy; my += sy; lado = 1; } if (my < 0 || mx < 0 || my >= MH || mx >= MW) { t = 1; break; } t = mapa[my][mx]; if (t > 0) break; }
+      const dist = Math.max(.05, lado === 0 ? lx - ddx : ly - ddy); zbuf[x] = dist;
+      const alto = (H / dist) | 0, ini = Math.max(0, (H - alto) >> 1), fin = Math.min(H, (H + alto) >> 1);
+      let wx = lado === 0 ? jugador.y + dist * ry : jugador.x + dist * rx; wx -= Math.floor(wx);
+      let tx = (wx * TEX) | 0; if ((lado === 0 && rx > 0) || (lado === 1 && ry < 0)) tx = TEX - tx - 1;
+      const tex = TEXTURAS[t] || texRoca, brillo = t === 4 || t === 6 ? 1 : Math.min(1, 1.6 / (dist * .55 + .6)) * (lado ? .78 : 1);
+      const paso = TEX / alto; let ty = (ini - (H - alto) / 2) * paso;
+      for (let y = ini; y < fin; y++) { buf[y * W + x] = sombra(tex[(ty & 63) * TEX + tx], brillo); ty += paso; }
+    }
+    
+    const lista = [];
+    const SPR = { chispa: sprChispa, martillo: sprMartillo, ceniciento: sprCeniciento, vigia: sprVigia, reptante: sprReptante, sombra: sprSombra, coloso: sprColoso }, ESC = { chispa: .55, martillo: .9, ceniciento: 1.05, vigia: .95, reptante: .6, sombra: 1, coloso: 1.35 };
+    enemigos.forEach(en => lista.push({ x: en.x, y: en.y, s: SPR[en.tipo], esc: ESC[en.tipo], flash: en.daño > 0 || en.vida <= 0, dither: en.tipo === 'sombra', bajo: en.tipo === 'reptante', bob: en.tipo === 'chispa' ? Math.sin(tiempo * 6 + en.x) * .08 : 0 }));
+    items.forEach(it => lista.push({ x: it.x, y: it.y, s: { vida: sprVida, llave: sprLlave, remaches: sprRemaches, espada: sprEspada, hoja: sprHoja, escopeta: sprEscopeta, lanzallamas: sprLanzallamas, arpon: sprArpon }[it.tipo], esc: .4, bajo: true, bob: Math.sin(tiempo * 3 + it.x) * .04 }));
+    const BSPR = { remache: [sprRemacheBala, .2], perdigon: [sprPerdigon, .14], llama: [sprLlama, .3], cristal: [sprCristal, .3] };
+    balas.forEach(b => { const [bs, be] = b.mia ? BSPR[b.spr] : [b.fuego ? sprFuego : sprBala, b.fuego ? .32 : .25]; lista.push({ x: b.x, y: b.y, s: bs, esc: be, brillo: true }); });
+    lista.forEach(o => o.d = (o.x - jugador.x) ** 2 + (o.y - jugador.y) ** 2); lista.sort((a, b) => b.d - a.d);
+    const inv = 1 / (planoX * dirY - dirX * planoY);
+    lista.forEach(o => {
+      const sx = o.x - jugador.x, sy = o.y - jugador.y, tx = inv * (dirY * sx - dirX * sy), tz = inv * (-planoY * sx + planoX * sy);
+      if (tz <= .1) return;
+      const pantX = (W / 2) * (1 + tx / tz), tam = Math.abs(H / tz) * o.esc | 0;
+      const desplY = ((o.bajo ? (1 - o.esc) * .5 : 0) + (o.bob || 0)) * H / tz;
+      const y0 = (H / 2 - tam / 2 + desplY) | 0, x0 = (pantX - tam / 2) | 0, luz = o.brillo ? 1 : Math.min(1, 1.6 / (tz * .55 + .6));
+      for (let i = Math.max(0, x0); i < Math.min(W, x0 + tam); i++) {
+        if (tz >= zbuf[i]) continue;
+        const u = ((i - x0) * SP / tam) | 0;
+        for (let j = Math.max(0, y0); j < Math.min(H, y0 + tam); j++) { if (o.dither && ((i + j + (tiempo * 20 | 0)) & 1)) continue; const c = o.s[(((j - y0) * SP / tam) | 0) * SP + u]; if (c) buf[j * W + i] = o.flash ? rgb(255, 255, 255) : sombra(c, luz); }
+      }
+    });
+    ctx.putImageData(img, 0, 0);
+    
+    const bx = W / 2 + Math.sin(tiempo * 7) * (teclas.KeyW || teclas.ArrowUp ? 4 : 1), by = H - 24 + jugador.retroceso * 10 + Math.abs(Math.cos(tiempo * 7)) * 2;
+    const AR = ARMAS[jugador.arma];
+    if (AR.espada) {
+      const giro = jugador.retroceso, ang = -.9 + (1 - giro) * .6 - giro * .9, largo = jugador.arma === 4 ? 78 : 70;
+      ctx.save(); ctx.translate(bx + 40, by + 20); ctx.rotate(ang);
+      ctx.fillStyle = jugador.arma === 4 ? '#ff6a1a' : '#2b2838'; ctx.fillRect(-4, -largo, 8, largo);
+      ctx.fillStyle = jugador.arma === 4 ? '#ffe9a0' : '#c8c8e6'; ctx.fillRect(-1, -largo + 2, 2, largo - 6);
+      ctx.fillStyle = '#ffc83c'; ctx.fillRect(-12, -2, 24, 5); ctx.fillStyle = '#5a3c28'; ctx.fillRect(-3, 3, 6, 14); ctx.restore();
+    } else if (jugador.arma === 5) { ctx.fillStyle = '#5a5e66'; ctx.fillRect(bx - 22, by - 34, 18, 44); ctx.fillRect(bx + 4, by - 34, 18, 44); ctx.fillStyle = '#7a5032'; ctx.fillRect(bx - 24, by - 4, 48, 14); if (jugador.retroceso > .6) { ctx.fillStyle = '#fff3c4'; ctx.fillRect(bx - 22, by - 46, 44, 10); } }
+    else if (jugador.arma === 6) { ctx.fillStyle = '#5b5f68'; ctx.fillRect(bx - 6, by - 50, 12, 56); ctx.fillStyle = '#c8461e'; ctx.fillRect(bx - 18, by - 10, 36, 20); ctx.fillStyle = disparando ? '#ffd166' : '#ff6a1a'; ctx.fillRect(bx - 4, by - 56, 8, 8); }
+    else if (jugador.arma === 7) { ctx.fillStyle = '#3b3f48'; ctx.fillRect(bx - 10, by - 30, 20, 40); ctx.fillStyle = '#8ef0ff'; ctx.fillRect(bx - 2, by - 66 + jugador.retroceso * 20, 4, 40); ctx.fillStyle = '#e6ffff'; ctx.fillRect(bx - 5, by - 70 + jugador.retroceso * 20, 10, 6); }
+    else if (jugador.arma === 1) { ctx.fillStyle = '#5b5f68'; ctx.fillRect(bx + 18, by - 34, 10, 40); ctx.fillStyle = '#8a8f99'; ctx.fillRect(bx + 10, by - 44, 26, 12); ctx.fillStyle = '#ff6a1a'; ctx.fillRect(bx + 20, by - 4, 6, 10); }
+    else { ctx.fillStyle = '#3a3d44'; ctx.fillRect(bx - 16, by - 30, 32, 38); ctx.fillStyle = '#7a7f88'; ctx.fillRect(bx - 8, by - 46, 16, 20); ctx.fillStyle = '#ff6a1a'; ctx.fillRect(bx - 14, by - 22, 28, 4); if (jugador.retroceso > .6) { ctx.fillStyle = '#ffe27a'; ctx.fillRect(bx - 5, by - 56, 10, 10); } }
+    
+    ctx.fillStyle = '#0b0b0ccc'; ctx.fillRect(0, H - 16, W, 16);
+    ctx.font = '8px monospace'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ff4d6d'; ctx.fillText('♥'.repeat(jugador.vidas), 6, H - 8);
+    ctx.fillStyle = jugador.vida > 30 ? '#4ade80' : '#ff4d2e'; ctx.fillText('VIDA ' + Math.ceil(jugador.vida), 34, H - 8);
+    ctx.fillStyle = '#e5e7eb'; ctx.fillText('REMACHES ' + Math.floor(jugador.remaches), 90, H - 8);
+    ctx.fillStyle = '#ff6a1a'; ctx.fillText(ARMAS[jugador.arma].corto, 175, H - 8);
+    ctx.fillStyle = tieneLlave ? '#ffc828' : '#555'; ctx.fillText(tieneLlave ? 'LLAVE DE SALIDA' : 'SIN LLAVE', 238, H - 8);
+    if (jugador.escudo > 0 && (tiempo * 8 | 0) % 2) { ctx.strokeStyle = '#ffffff88'; ctx.strokeRect(2, 2, W - 4, H - 20); }
+    ctx.fillStyle = '#ff6a1a'; ctx.fillRect(W / 2 - 1, H / 2 - 4, 2, 8); ctx.fillRect(W / 2 - 4, H / 2 - 1, 8, 2);
+    const ahora = performance.now(); mensajes = mensajes.filter(m => m.hasta > ahora);
+    mensajes.forEach((m, i) => { ctx.fillStyle = '#ffffffdd'; ctx.fillText(m.t, 6, 10 + i * 10); });
+    if (jugador.golpe > 0) { ctx.fillStyle = `rgba(255,40,20,${jugador.golpe * 1.4})`; ctx.fillRect(0, 0, W, H); }
+  };
+  const pantalla = (titulo, sub, color) => {
+    ctx.fillStyle = '#0b0b0c'; ctx.fillRect(0, 0, W, H);
+    for (let i = 0; i < 60; i++) { ctx.fillStyle = `rgba(255,${80 + (i * 37) % 100},20,${.08 + (i % 5) * .03})`; ctx.fillRect((i * 53 + tiempo * 20) % W, H - ((i * 29 + tiempo * 30) % H), 2, 2); }
+    ctx.textAlign = 'center'; ctx.fillStyle = color; ctx.font = 'bold 34px monospace'; ctx.fillText(titulo, W / 2, H / 2 - 18);
+    ctx.fillStyle = '#e5e7eb'; ctx.font = '9px monospace'; ctx.fillText(sub, W / 2, H / 2 + 14);
+    ctx.fillStyle = '#9ca3af'; ctx.fillText('WASD moverse · mouse girar · clic atacar · 1-7, Q o rueda: armas · E usar', W / 2, H / 2 + 34);
+    ctx.textAlign = 'left';
+  };
+
+  
+  estado = 'inicio'; iniciar();
+  let previo = performance.now();
+  const bucle = ahora => {
+    const dt = Math.min(.05, (ahora - previo) / 1000); previo = ahora;
+    if (estado === 'jugando') { actualizar(dt); dibujar(); }
+    else { tiempo += dt; pantalla(estado === 'inicio' ? 'CALDERA' : estado === 'muerte' ? 'CAÍSTE' : 'SALISTE',
+      estado === 'inicio' ? 'Haz clic o toca para bajar al volcán' : estado === 'muerte' ? 'Se acabaron tus vidas. Clic para reintentar' : 'Escapaste de la estación. Clic para jugar otra vez',
+      estado === 'victoria' ? '#4ade80' : '#ff6a1a'); }
+    requestAnimationFrame(bucle);
+  };
+  requestAnimationFrame(bucle);
+
+  
+  document.querySelectorAll('canvas[data-cl-sprite]').forEach(c => {
+    const s = { chispa: sprChispa, martillo: sprMartillo, ceniciento: sprCeniciento, vigia: sprVigia, reptante: sprReptante, sombra: sprSombra, coloso: sprColoso, espada: sprEspada, hoja: sprHoja, escopeta: sprEscopeta, lanzallamas: sprLanzallamas, arpon: sprArpon, vida: sprVida, remaches: sprRemaches, llave: sprLlave }[c.dataset.clSprite]; if (!s) return;
+    c.width = SP; c.height = SP; const x = c.getContext('2d'), im = x.createImageData(SP, SP); new Uint32Array(im.data.buffer).set(s); x.putImageData(im, 0, 0);
+  });
+})();
+
+</script>
+</body></html>

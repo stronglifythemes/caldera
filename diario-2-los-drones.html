@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang='es'>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width">
+<meta name="builder" content="Stronglify">
+<link rel="icon" type="image/x-icon" href="https://media.stronglify.com/295/favicon-caldera-1795215931.svg">
+<title>Diario 2: los drones · Caldera</title>
+<meta name="description" content="Chispa y Martillo: dos drones, dos formas de complicarte la vida.">
+<meta name="robots" content="index">
+<link rel="canonical" href="https://stronglifythemes.github.io/diario-2-los-drones"><style>
+html{line-height:1.15;-webkit-text-size-adjust:100%}body{margin:0}main{display:block}h1{font-size:2em;margin:.67em 0}hr{box-sizing:content-box;height:0;overflow:visible}pre{font-family:monospace,monospace;font-size:1em}a{background-color:transparent}abbr[title]{border-bottom:none;text-decoration:underline;text-decoration:underline dotted}b,strong{font-weight:bolder}code,kbd,samp{font-family:monospace,monospace;font-size:1em}small{font-size:80%}sub,sup{font-size:75%;line-height:0;position:relative;vertical-align:baseline}sub{bottom:-.25em}sup{top:-.5em}img{border-style:none}button,input,optgroup,select,textarea{font-family:inherit;font-size:100%;line-height:1.15;margin:0}button,input{overflow:visible}button,select{text-transform:none}button,[type=button],[type=reset],[type=submit]{-webkit-appearance:button}button::-moz-focus-inner,[type=button]::-moz-focus-inner,[type=reset]::-moz-focus-inner,[type=submit]::-moz-focus-inner{border-style:none;padding:0}button:-moz-focusring,[type=button]:-moz-focusring,[type=reset]:-moz-focusring,[type=submit]:-moz-focusring{outline:1px dotted ButtonText}
+fieldset{padding:.35em .75em .625em}legend{box-sizing:border-box;color:inherit;display:table;max-width:100%;padding:0;white-space:normal}progress{vertical-align:baseline}textarea{overflow:auto}[type=checkbox],[type=radio]{box-sizing:border-box;padding:0}[type=number]::-webkit-inner-spin-button,[type=number]::-webkit-outer-spin-button{height:auto}[type=search]{-webkit-appearance:textfield;outline-offset:-2px}[type=search]::-webkit-search-decoration{-webkit-appearance:none}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}details{display:block}summary{display:list-item}template{display:none}[hidden]{display:none}img{max-width:100%;height:auto}
+</style><style>
+:root { --negro:#0b0b0c; --acero:#2a2d33; --gris:#9ca3af; --magma:#ff6a1a; --brasa:#ffb347; --texto:#ece9e4; --mono:"IBM Plex Mono",ui-monospace,monospace; --sans:"Chakra Petch",system-ui,sans-serif; --pad:clamp(1rem,4vw,3rem); }
+*,*::before,*::after { box-sizing:border-box; }
+body.caldera { margin:0; background:var(--negro); color:var(--texto); font-family:var(--sans); }
+.caldera a { color:inherit; }
+.cd-header { position:sticky; top:0; z-index:20; display:flex; justify-content:space-between; align-items:center; gap:1rem; width:100%; padding:.9rem var(--pad); background:#0b0b0ce6; backdrop-filter:blur(6px); border-bottom:2px solid var(--magma); }
+.cd-marca { font-weight:700; font-size:1.4rem; letter-spacing:.18em; text-transform:uppercase; text-decoration:none; color:var(--magma); }
+.cd-header nav, .cd-footer nav { display:flex; flex-wrap:wrap; gap:clamp(.8rem,2.5vw,1.8rem); }
+.cd-header nav a, .cd-footer nav a { text-decoration:none; font-family:var(--mono); font-size:.9rem; text-transform:uppercase; letter-spacing:.06em; }
+.cd-header nav a:hover, .cd-footer nav a:hover { color:var(--magma); }
+.cd-juego { position:relative; width:100%; background:#000; border-bottom:2px solid var(--acero); }
+.cd-juego canvas { display:block; width:100%; height:auto; max-height:calc(100svh - 6rem); aspect-ratio:16/10; object-fit:contain; image-rendering:pixelated; image-rendering:crisp-edges; cursor:crosshair; outline:none; background:#000; }
+.cd-juego canvas:focus-visible { box-shadow:inset 0 0 0 3px var(--magma); }
+.cd-juego-barra { display:flex; justify-content:space-between; align-items:center; gap:1rem; flex-wrap:wrap; padding:.7rem var(--pad); font-family:var(--mono); font-size:.85rem; color:var(--gris); background:#111214; }
+.cd-juego-barra button, .cd-tactil button { font:inherit; color:var(--texto); background:var(--acero); border:1px solid #444; padding:.45rem .9rem; cursor:pointer; }
+.cd-juego-barra button:hover { border-color:var(--magma); color:var(--magma); }
+.cd-tactil { display:none; }
+@media (hover:none) and (pointer:coarse) {
+  .cd-tactil { display:flex; justify-content:space-between; align-items:center; gap:1rem; padding:1rem var(--pad); background:#111214; }
+  .cd-stick { width:8.5rem; height:8.5rem; border-radius:50%; border:2px solid var(--magma); background:radial-gradient(circle,#ff6a1a33 0 30%,transparent 31%); touch-action:none; }
+  .cd-tactil-botones { display:flex; flex-direction:column; gap:.7rem; }
+  .cd-tactil button { min-width:7rem; min-height:3.2rem; font-family:var(--mono); text-transform:uppercase; touch-action:none; }
+  .cd-tactil button[data-cl-disparar] { background:var(--magma); color:#000; border-color:var(--magma); }
+}
+.cd-main section { padding:clamp(3rem,8vw,6.5rem) var(--pad); }
+.cd-main h2 { margin:0 0 clamp(1.5rem,4vw,2.5rem); font-size:clamp(2.2rem,6vw,4.8rem); line-height:.95; text-transform:uppercase; letter-spacing:-.01em; }
+.cd-historia { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:clamp(1.5rem,5vw,4rem); align-items:start; background:linear-gradient(180deg,#160a05,#0b0b0c 70%); }
+.cd-historia h1 { margin:0; grid-column:1/-1; font-size:clamp(4rem,14vw,12rem); line-height:.82; letter-spacing:.04em; color:var(--magma); text-shadow:0 0 30px #ff6a1a66; }
+.cd-lead { margin:0; font-size:clamp(1.3rem,2.4vw,2rem); line-height:1.25; }
+.cd-historia-texto { font-size:1.1rem; line-height:1.65; color:#cfcac2; }
+.cd-historia-texto p { margin:0 0 1rem; }
+.cd-controles ul { list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,15rem),1fr)); gap:1rem; }
+.cd-controles li { display:grid; gap:.6rem; padding:1.2rem; background:#141518; border:1px solid var(--acero); }
+.cd-controles kbd { justify-self:start; padding:.35rem .7rem; font-family:var(--mono); font-size:1rem; color:#000; background:var(--brasa); border-bottom:3px solid #b5541a; }
+.cd-bestiario-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,13rem),1fr)); gap:1rem; }
+.cd-bestiario article { display:grid; gap:.6rem; justify-items:center; text-align:center; padding:1.6rem 1.2rem; background:#141518; border:1px solid var(--acero); }
+.cd-bestiario canvas { width:7rem; height:7rem; image-rendering:pixelated; image-rendering:crisp-edges; }
+.cd-bestiario h3 { margin:0; font-size:1.5rem; text-transform:uppercase; color:var(--brasa); }
+.cd-bestiario p { margin:0; line-height:1.5; color:#cfcac2; }
+.cd-faq { max-width:60rem; }
+.cd-faq details { padding:1.1rem 1.3rem; margin-bottom:.8rem; background:#141518; border-left:3px solid var(--magma); }
+.cd-faq summary { cursor:pointer; font-size:1.25rem; font-weight:700; }
+.cd-faq p { margin:.7rem 0 0; line-height:1.6; color:#cfcac2; }
+.cd-cta { display:grid; justify-items:center; gap:1.2rem; text-align:center; background:var(--magma); color:#000; }
+.cd-cta h2 { margin:0 !important; color:#000; }
+.cd-boton { display:inline-block; padding:1rem 1.6rem; background:#000; color:var(--magma) !important; text-decoration:none; font-family:var(--mono); font-weight:700; text-transform:uppercase; letter-spacing:.08em; }
+.cd-footer { padding:clamp(3rem,7vw,5rem) var(--pad) 2rem; background:#060607; border-top:2px solid var(--magma); }
+.cd-footer p { margin:0 0 2.5rem; max-width:24ch; font-size:clamp(1.8rem,4.5vw,3.6rem); line-height:1; text-transform:uppercase; }
+.cd-footer > div { display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem; padding-top:1.4rem; border-top:1px solid #222; }
+.cd-cabecera h1 { margin:0; font-size:clamp(3rem,10vw,8rem); line-height:.88; text-transform:uppercase; color:var(--magma); }
+.cd-cabecera p { margin:1rem 0 0; max-width:40ch; font-size:clamp(1.1rem,2vw,1.4rem); }
+.cd-blog { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,20rem),1fr)); gap:1rem; padding:0 var(--pad) clamp(3rem,8vw,6rem); }
+.cd-entrada { display:grid; gap:.6rem; align-content:start; padding:1.6rem; background:#141518; border:1px solid var(--acero); text-decoration:none; transition:border-color .2s; }
+.cd-entrada:hover { border-color:var(--magma); }
+.cd-entrada span { font-family:var(--mono); font-size:.85rem; color:var(--brasa); }
+.cd-entrada h2 { margin:0 !important; font-size:clamp(1.5rem,2.6vw,2rem) !important; }
+.cd-entrada p { margin:0; line-height:1.55; color:#cfcac2; }
+.cd-prosa { width:min(calc(100% - 2rem),46rem); margin:0 auto clamp(3rem,8vw,6rem); font-size:clamp(1.05rem,1.6vw,1.2rem); line-height:1.7; color:#d8d3cb; }
+.cd-prosa h2 { margin:2rem 0 .5rem !important; font-size:clamp(1.6rem,3vw,2.3rem) !important; color:var(--magma); }
+.cd-blank { min-height:40vh; padding-top:2rem; }
+@media (max-width:52rem) { .cd-historia { grid-template-columns:minmax(0,1fr); } }
+ 
+.cd-solo-juego { margin:0; }
+.cd-solo-juego .cd-juego { position:relative; width:100%; height:calc(100svh - 3.9rem); background:#000; border:0; overflow:hidden; }
+.cd-solo-juego .cd-juego canvas { width:100%; height:100%; max-height:none; aspect-ratio:auto; object-fit:contain; }
+.cd-sonido { position:absolute; top:.8rem; right:.8rem; z-index:3; font:500 .8rem var(--mono); color:var(--texto); background:#000a; border:1px solid #444; padding:.4rem .8rem; cursor:pointer; }
+.cd-sonido:hover { border-color:var(--magma); color:var(--magma); }
+@media (hover:none) and (pointer:coarse) {
+  .cd-solo-juego .cd-tactil { position:absolute; left:0; right:0; bottom:0; z-index:3; background:transparent; padding:1rem; }
+}
+</style><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=IBM+Plex+Mono:wght@500&display=swap" rel="stylesheet"></head>
+<body class="caldera">
+  <header class="cd-header">
+  <a class="cd-marca" href="./">Caldera</a>
+  <nav aria-label="Navegación principal">
+    
+    <a href="./">Jugar</a>
+    
+    <a href="./blog">Diario</a>
+    
+    <a href="./acerca-de">Acerca de</a>
+    
+    <a href="./contacto">Contacto</a>
+    
+  </nav>
+</header>
+
+<main class="cd-main cd-pagina">
+  <section class="cd-cabecera"><h1>Diario 2: los drones</h1><p>Chispa y Martillo: dos drones, dos formas de complicarte la vida.</p></section>
+  <article class="cd-prosa"><p>Los enemigos son drones de mantenimiento que dejaron de distinguir entre una falla y una persona.</p><h2>Chispa</h2><p>Rápido y pequeño. Te busca y ataca de cerca.</p><h2>Martillo</h2><p>Pesado y lento. Prefiere mantener la distancia y disparar pernos al rojo.</p></article>
+</main>
+<footer class="cd-footer">
+  <p>Baja, encuentra la llave y sal antes de que el volcán despierte.</p>
+  <div>
+    <a class="cd-marca" href="./">Caldera</a>
+    <nav aria-label="Navegación del pie">
+      
+      <a href="./">Jugar</a>
+      
+      <a href="./blog">Diario</a>
+      
+      <a href="./acerca-de">Acerca de</a>
+      
+      <a href="./contacto">Contacto</a>
+      
+    </nav>
+  </div>
+</footer>
+</body>
+</html>
